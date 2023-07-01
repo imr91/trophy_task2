@@ -20,35 +20,61 @@ var tomatoIcon = L.icon({
     iconAnchor: [15,15]
 })
 
-var speedKm = 500;
-var distanceMeter = (speedKm * 1000 / (60*60)).toFixed(2);
-//console.log(distanceMeter);
+//speed to distance
+var normalSpeedKmph = 500;
+var turboSpeedKmph = 1000;
+var distanceMeter = (normalSpeedKmph * 1000 / (60*60)).toFixed(2);
+var distanceMeterTurbo = (turboSpeedKmph * 1000 / (60*60)).toFixed(2);
+
+//constants with normal and turbo distance to calculate new lat lon coordinates
+const calLon = (distanceMeter / 6378000) * (180/ Math.PI) / Math.cos(lat * Math.PI/180);
+const calLonTurbo = (distanceMeterTurbo / 6378000) * (180/ Math.PI) / Math.cos(lat * Math.PI/180);
+const calLat = (distanceMeter / 6378000) * (180/ Math.PI);
+const calLatTurbo = (distanceMeterTurbo / 6378000) * (180/ Math.PI);
 
 var playerMarker = L.marker([lat, lon], {icon: tomatoIcon}).addTo(map);
 
-document.onkeydown = function(event) {
-    switch (event.keyCode) {
-       case 37: //left
-            lon = lon - (distanceMeter / 6378000) * (180/ Math.PI) / Math.cos(lat * Math.PI/180); 
-            console.log(lon);
-            moveMarker(lat, lon);
-       break;
-       case 38: //up
-            lat = lat + (distanceMeter / 6378000) * (180/ Math.PI);
-            moveMarker(lat, lon);
-       break; 
-       case 39: //right
-            lon = lon + (distanceMeter / 6378000) * (180/ Math.PI) / Math.cos(lat * Math.PI/180); 
-            console.log(lon);
-            moveMarker(lat, lon);
-       break;
-       case 40: //down
-            lat = lat - (distanceMeter / 6378000) * (180/ Math.PI);
-            moveMarker(lat, lon);
-       break;
-    }
- };
+var controlKeys =[];
+document.addEventListener('keydown', (event) => {
+    controlKeys[event.key] = true;
 
+    if (controlKeys[' '] && controlKeys['ArrowLeft']) {
+        lon = lon - calLonTurbo; 
+            moveMarker(lat, lon);
+    }
+    if (controlKeys[' '] && controlKeys['ArrowUp']) {
+        lat = lat + calLatTurbo;
+            moveMarker(lat, lon);
+    }
+    if (controlKeys[' '] && controlKeys['ArrowRight']) {
+        lon = lon + calLonTurbo; 
+            moveMarker(lat, lon);
+    }
+    if (controlKeys[' '] && controlKeys['ArrowDown']) {
+        lat = lat - calLatTurbo;
+            moveMarker(lat, lon);
+    }
+    if (controlKeys['ArrowLeft']) {
+        lon = lon - calLon; 
+            moveMarker(lat, lon);
+    }
+    if (controlKeys['ArrowUp']) {
+        lat = lat + calLat;
+            moveMarker(lat, lon);
+    }
+    if (controlKeys['ArrowRight']) {
+        lon = lon + calLon; 
+            moveMarker(lat, lon);
+    }
+    if (controlKeys['ArrowDown']) {
+        lat = lat - calLat;
+            moveMarker(lat, lon);
+    }
+ });
+ 
+ document.addEventListener('keyup', (event) => {
+    delete controlKeys[event.key];
+ });
 
  function moveMarker(lat, lon){
 
