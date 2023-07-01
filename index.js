@@ -1,7 +1,8 @@
 var lat = 55.68344327;
 var lon = 12.5717693;
+var playTime = 0;
 
-var map = L.map('map').setView([lat, lon], 14);
+var map = L.map('map').setView([lat, lon], 13);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -81,4 +82,21 @@ document.addEventListener('keydown', (event) => {
     playerMarker.setLatLng([lat, lon]).update();
     map.panTo(new L.LatLng(lat,lon));
     //map.setView(new L.LatLng(lat,lon), 14);
+    checkFinish();
  };
+
+ function checkFinish(){
+    var distToFinish = map.distance(playerMarker.getLatLng(), finishCircle.getLatLng());
+    var isTomatoFinished = distToFinish <= finishCircle.getRadius();
+    //console.log(distToFinish + ' ' + isTomatoFinished);
+    if(isTomatoFinished){
+        clearInterval(time);
+        prompt("Tomato found its family in " + playTime + ' seconds.\nEnter your name for the scoreboard.');
+    }
+ };
+
+ function countTime(){
+    playTime += 1;
+ };
+
+ var time = setInterval(countTime, 1000);
