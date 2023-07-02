@@ -48,7 +48,7 @@
                     $num =1;
                     if ($result -> num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
-                            echo "<tr><td class='rownum'>".$num."</td><td>".$row['player_name']."</td><td class='scorenum'>".$row['score']."</td><td>".$row['score_date']."</td></tr>";
+                            echo "<tr><td class='rownum'>".$num."</td><td>".$row['player_name']."</td><td class='scorenum'>".$row['score']."</td><td class='scoredate'>".$row['score_date']."</td></tr>";
                             $num++;
                         };
                     }
@@ -56,6 +56,9 @@
                 ?>
             </tbody>
         </table>
+        <div class='button'>
+            <input type='button' value='Restart' id='restart_button' />
+        </div>
     </div>
     <div style='position:relative;width:100%;height:100%;'>
         <div id='map' style='width:100%;height:100vh;will-change: transform;'>
