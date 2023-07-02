@@ -24,7 +24,9 @@
     <div class='score' >
         <div id='description'>
             <p>Tomato Run</p>
-            Tomato would like to meet its family. Navigate with arrow keys to help Tomato and use spacebar to go even faster!
+            <span>Tomato would like to meet its family. Navigate with arrow keys to help Tomato and use spacebar to go even faster!</span>
+            <p>Distance to family:</p>
+            <div id='tofinish'></div>
         </div>    
     
         <table id='scoretable'>
@@ -44,7 +46,7 @@
                     $num =1;
                     if ($result -> num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
-                            echo "<tr><td>".$num."</td><td>".$row['player_name']."</td><td class='scorenum'>".$row['score']."</td><td>".$row['score_date']."</td></tr>";
+                            echo "<tr><td class='rownum'>".$num."</td><td>".$row['player_name']."</td><td class='scorenum'>".$row['score']."</td><td>".$row['score_date']."</td></tr>";
                             $num++;
                         };
                     }
