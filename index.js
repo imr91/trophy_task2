@@ -1,8 +1,10 @@
 /*var lat = 55.68344327;
 var lon = 12.5717693;*/
+lat = parseFloat(lat);
+lon = parseFloat(lon);
 var playTime = 0;
 
-var map = L.map('map').setView([lat, lon], 12);
+var map = L.map('map').setView([lat, lon], 11);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -139,9 +141,16 @@ document.addEventListener('keydown', (event) => {
             var confirmText = 'Your score is saved, check the score board!\nPress OK to play again.';
         
             if( msg && confirm(confirmText)){
-                console.log('restart');
+                //console.log('restart');
                 location.reload();
             }
             else{}
     });
  }
+
+ $("#restart_button").click(function(){
+    var confirmQuestion = 'Are you sure to restart the game? The current progression will be lost.';
+    if(confirm(confirmQuestion)){
+        location.reload();
+    }
+ });
