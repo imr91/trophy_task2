@@ -1,5 +1,6 @@
 <?php
     $con = new mysqli("127.0.0.1", "game_admin", "game202306", "trophy_task2");
+    session_start();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,6 +17,7 @@
             integrity="sha256-o9N1jGDZrf5tS+Ft4gbIK7mYMipq9lqpVJ91xHSyKhg="
             crossorigin=""></script>
     <link rel='stylesheet' href='index.css'/>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
     <script src='index.js' defer></script>
 
 </head>
@@ -41,7 +43,7 @@
             </thead>
             <tbody>
                 <?php
-                   $query = "SELECT * FROM game_scores ORDER BY score DESC LIMIT 10";
+                   $query = "SELECT * FROM game_scores ORDER BY score ASC LIMIT 10";
                     $result = $con -> query($query);
                     $num =1;
                     if ($result -> num_rows > 0) {
@@ -50,6 +52,7 @@
                             $num++;
                         };
                     }
+                    mysqli_free_result($result);
                 ?>
             </tbody>
         </table>
@@ -62,3 +65,31 @@
 </div>
 </body>
 </html>
+
+<?php
+    $query = "SELECT * FROM game_config ORDER BY config_id DESC LIMIT 1";
+    $result = $con -> query($query);
+    if($result -> num_rows > 0){
+        $config_row = $result->fetch_assoc();
+        $startLat = $config_row['startLat'];
+        $startLon = $config_row['startLon'];
+        $finishLat = $config_row['finishLat'];
+        $finishLon = $config_row['finishLon'];
+        $speed = $config_row['speed'];
+        $turbo = $config_row['speed_turbo'];
+    }
+    
+    mysqli_free_result($result);
+    $con -> close();
+    $php_session = session_id();
+    session_destroy();
+?>
+<script>
+    var lat = '<?=$startLat?>';
+    var lon = '<?=$startLon?>';
+    var finishLat = '<?=$finishLat?>';
+    var finishLon = '<?=$finishLon?>';
+    var normalSpeedKmph = '<?=$speed?>';
+    var turboSpeedKmph = '<?=$turbo?>';
+    var sessionId = '<?=$php_session?>';
+</script>
