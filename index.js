@@ -3,8 +3,16 @@ var lon = 12.5717693;*/
 lat = parseFloat(lat);
 lon = parseFloat(lon);
 var playTime = 0;
+var timeCorrection = 10;
+var startGame = false;
 
-var map = L.map('map').setView([lat, lon], 11);
+//var map = L.map('map').setView([lat, lon], 12);
+var map = L.map('map', {
+    center: [lat, lon],
+    zoom:12,
+    keyboard: false
+});
+
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -26,8 +34,8 @@ var tomatoIcon = L.icon({
 //speed to distance
 /*var normalSpeedKmph = 500;
 var turboSpeedKmph = 1000;*/
-var distanceMeter = (normalSpeedKmph * 1000 / (60*60)).toFixed(2);
-var distanceMeterTurbo = (turboSpeedKmph * 1000 / (60*60)).toFixed(2);
+var distanceMeter = ((normalSpeedKmph * 1000 / (60*60))/timeCorrection).toFixed(2);
+var distanceMeterTurbo = ((turboSpeedKmph * 1000 / (60*60))/timeCorrection).toFixed(2);
 
 //constants with normal and turbo distance to calculate new lat lon coordinates
 const calLon = (distanceMeter / 6378000) * (180/ Math.PI) / Math.cos(lat * Math.PI/180);
@@ -43,7 +51,13 @@ document.getElementById('tofinish').innerHTML = (startDistance/1000).toFixed(2) 
 var controlKeys =[];
 document.addEventListener('keydown', (event) => {
     controlKeys[event.key] = true;
+ });
+ 
+ document.addEventListener('keyup', (event) => {
+    delete controlKeys[event.key];
+ });
 
+function checkMovement(){
     if (controlKeys[' ']){
         if (controlKeys['ArrowLeft']) {
             lon = lon - calLonTurbo; 
@@ -80,29 +94,13 @@ document.addEventListener('keydown', (event) => {
                 moveMarker(lat, lon);
         }
     }
-    
-    
- });
- 
- document.addEventListener('keyup', (event) => {
-    delete controlKeys[event.key];
- });
+};
 
  function moveMarker(lat, lon){
-    //smooth out the marker position update without animation
-    var curLat = playerMarker.getLatLng().lat;
-    var curLon = playerMarker.getLatLng().lng;
-    var deltaLat = (lat - curLat)/100;
-    var deltaLon = (lon - curLon)/100;
-    //console.log(deltaLat + ' ' + deltaLon);
-
-    for (let i = 0; i < 100; i++) {
-                curLat += deltaLat;
-                curLon += deltaLon;
-                playerMarker.setLatLng([curLat, curLon]).update();        
+    if(startGame === false){
+        startGame = true;
     }
-
-    //playerMarker.setLatLng([lat, lon]).update();
+    playerMarker.setLatLng([lat, lon]).update();
     map.panTo(new L.LatLng(lat,lon));
     //map.setView(new L.LatLng(lat,lon), 14);
     checkFinish();
@@ -116,6 +114,7 @@ document.addEventListener('keydown', (event) => {
     if(isTomatoFinished){
         document.getElementById('tofinish').innerHTML = (distToFinish/1000).toFixed(2) + ' km';
         clearInterval(time);
+        playTime = playTime.toFixed(0);
         var playerName = prompt("Tomato found its family in " + playTime + ' seconds.\nEnter your name for the scoreboard.');
         console.log(playerName);
         storeResult(playerName, playTime);
@@ -123,10 +122,19 @@ document.addEventListener('keydown', (event) => {
  };
 
  function countTime(){
-    playTime += 1;
+    if(startGame === true){
+        playTime += 1/timeCorrection;
+    }
  };
 
- var time = setInterval(countTime, 1000);
+ /*
+ movement check and timer increase every 100ms to get smoother tomato movement
+ timeCorrection should be set to 1 when setInterval timer=1000
+ */
+ var time = setInterval(function(){
+    checkMovement();
+    countTime();
+ }, 100);
 
  function storeResult(playerName, playTime){
     $.ajax({
